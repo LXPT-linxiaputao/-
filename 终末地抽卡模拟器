@@ -1,0 +1,476 @@
+
+Sprite img_kamiu, img_mifu, img_zhuangfangyi, img_yujin, img_lifeng, img_aierdaila, img_bieli, img_junwei;
+Sprite img_peilika, img_huguang, img_aiweiwenna, img_dapan, img_chenqianyu, img_langwei, img_saixi, img_zhouxue, img_alieshe;
+Sprite img_qiuli, img_kaqier, img_aitela, img_yingshi, img_antaer;
+
+Sprite img_yu_icon;     
+Sprite img_stone_icon;  
+Sprite img_yu_big;       
+Sprite img_stone_big;    
+
+
+String[] pool6 = {"卡缪", "弥弗", "庄方宜", "余烬", "黎风", "艾尔黛拉", "别礼", "骏卫"};
+String[] pool5 = {"佩丽卡", "弧光", "艾维文娜","大潘", "陈千语", "狼卫","赛希", "昼雪","阿列什"};
+String[] pool4 = {"秋栗", "卡契尔", "埃特拉","萤石", "安塔尔"};
+
+float rate6 = 0.008;
+float rate5 = 0.08;
+int totalPulls = 0;
+int pity5Counter = 0;
+int pity6Counter = 0;
+boolean hasGottenKamiu = false;
+
+ArrayList<Operator> currentResult = new ArrayList<Operator>();
+ArrayList<String> historyLog = new ArrayList<String>();
+boolean isWindowOpen = false;
+ArrayList<Operator> showQueue = new ArrayList<Operator>();
+
+
+int currentPage = 1; 
+int itemsPerPage = 10;
+
+
+int qianJingYu = 5000;        
+int yanZhiYuanShi = 95;       
+boolean isStoreOpen = false;  
+int dialogType = 0;           
+
+
+class Sprite {
+  PImage img;
+  float x, y, w, h;
+  Sprite(String url, float x, float y, float w, float h) {
+    this.img = loadImage(url);
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+  }
+  void draw() {
+    if (img != null) {
+      imageMode(CENTER);
+      image(img, x, y, w, h);
+      imageMode(CORNER);
+    }
+  }
+  void drawFullScreen() {
+    if (img != null) {
+      imageMode(CENTER);
+      image(img, width/2, height/2, w, h);
+      imageMode(CORNER);
+    }
+  }
+}
+
+class Operator {
+  String name;
+  int star;
+  Sprite sprite;
+  Operator(String n, int s, Sprite sp) {
+    name = n;
+    star = s;
+    sprite = sp;
+  }
+}
+
+
+void setup() {
+  size(500, 400);
+  textSize(16);
+  
+  img_kamiu        = new Sprite("https://storage.moegirl.org.cn/moegirl/commons/7/7f/%E7%BB%88%E6%9C%AB%E5%9C%B0%E7%AB%8B%E7%BB%98_%E5%8D%A1%E7%BC%AA.png", 250, 200, 280, 380);
+  img_mifu         = new Sprite("https://storage.moegirl.org.cn/moegirl/commons/3/38/%E7%BB%88%E6%9C%AB%E5%9C%B0%E7%AB%8B%E7%BB%98_%E5%BC%AD%E5%BC%97.png", 250, 200, 280, 380);
+  img_zhuangfangyi = new Sprite("https://storage.moegirl.org.cn/moegirl/commons/7/78/%E7%BB%88%E6%9C%AB%E5%9C%B0%E7%AB%8B%E7%BB%98_%E5%BA%84%E6%96%B9%E5%AE%9C.png", 250, 200, 280, 380);
+  img_yujin        = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/4/4f/opip8l1ltjgwul2ixz6s4eaihiwzs9k.png/400px-%E4%BD%99%E7%83%AC%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_lifeng       = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/5/5d/7flbuypbon8y8m55euyppps60t74ws3.png/800px-%E9%BB%8E%E9%A3%8E%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_aierdaila    = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/4/44/eu4b8cro6olz1661ukgxo9hsyzi4vd9.png/800px-%E8%89%BE%E5%B0%94%E9%BB%9B%E6%8B%89%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_bieli        = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/8/89/pbn6j6vda7dxfsw24znbtquobklnhdr.png/800px-%E5%88%AB%E7%A4%BC%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_junwei       = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/4/4f/ao4yyo3hgngno7pfnrpizgre18genzx.png/800px-%E9%AA%8F%E5%8D%AB%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  
+  img_peilika      = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/8/88/5bh5tuwy2oloxisg1jg9ezzfe9foupm.png/800px-%E4%BD%A9%E4%B8%BD%E5%8D%A1%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_huguang      = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/2/2d/r0giq825xkxjdt11aiquh97muytm4kc.png/800px-%E5%BC%A7%E5%85%89%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_aiweiwenna   = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/e/ee/loxtv8kxlkbxbw9s9s1uany6nbgvz1g.png/800px-%E8%89%BE%E7%BB%B4%E6%96%87%E5%A8%9C%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_dapan        = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/f/fb/tgbqgeybikct1o79sbtgojy73n47ku2.png/800px-%E5%A4%A7%E6%BD%98%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_chenqianyu   = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/0/0a/7oc2v8kqfgzaltfwm42og404l57kha4.png/800px-%E9%99%88%E5%8D%83%E8%AF%AD%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_langwei      = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/5/58/00lnamykwvtlsocgqt5aviju51wz1kp.png/800px-%E7%8B%BC%E5%8D%AB%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_saixi        = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/0/0e/34s7b2cdxfts8o3mxcg5j4r2nijqtmg.png/800px-%E8%B5%9B%E5%B8%8C%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_zhouxue      = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/8/89/bilf7bvb0hgcrb69pm71c4jg1mmw7u8.png/800px-%E6%98%BC%E9%9B%AA%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_alieshe      = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/6/6a/ghpzulbxkn3ti4w1ohmqnb5yaszgqk7.png/400px-%E9%98%BF%E5%88%97%E4%BB%80%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  
+  img_qiuli        = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/3/34/ei71tt30whm9bdvht9jnezwgm31oju6.png/800px-%E7%A7%8B%E6%A0%97%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_kaqier       = new Sprite("https://storage.moegirl.org.cn/moegirl/commons/0/01/%E7%BB%88%E6%9C%AB%E5%9C%B0%E7%AB%8B%E7%BB%98_%E5%8D%A1%E5%A5%91%E5%B0%94_1.png", 250, 200, 280, 380);
+  img_aitela       = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/d/d8/27zgky5gzgd8h3mtxto9zevkzpipyu3.png/800px-%E5%9F%83%E7%89%B9%E6%8B%89%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_yingshi      = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/3/3b/dt5eb74hmpii4o8pklq341quheiiq0j.png/800px-%E8%90%A4%E7%9F%B3%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  img_antaer       = new Sprite("https://patchwiki.biligame.com/images/zmd/thumb/a/a2/pxtwh3rbwz6f5wl9iwxhzd6xh3l7mmb.png/800px-%E5%AE%89%E5%A1%94%E5%B0%94%E7%AB%8B%E7%BB%98.png", 250, 200, 280, 380);
+  
+
+  img_yu_icon = new Sprite("https://patchwiki.biligame.com/images/zmd/8/8b/bd10omo2xwrqre833m7k0zbgnjdj4wn.png", 365, 23, 14, 14);     
+  img_stone_icon = new Sprite("https://torappu.prts.wiki/assets/item_icon/DIAMOND.png", 445, 23, 14, 14);  
+  img_yu_big = new Sprite("https://patchwiki.biligame.com/images/zmd/8/8b/bd10omo2xwrqre833m7k0zbgnjdj4wn.png", 250, 210, 40, 40);       
+  img_stone_big = new Sprite("https://torappu.prts.wiki/assets/item_icon/DIAMOND.png", 210, 210, 40, 40);    
+}
+
+Sprite getSpriteByName(String name) {
+  if (name.equals("卡缪")) return img_kamiu;
+  if (name.equals("弥弗")) return img_mifu;
+  if (name.equals("庄方宜")) return img_zhuangfangyi;
+  if (name.equals("余烬")) return img_yujin;
+  if (name.equals("黎风")) return img_lifeng;
+  if (name.equals("艾尔黛拉")) return img_aierdaila;
+  if (name.equals("别礼")) return img_bieli;
+  if (name.equals("骏卫")) return img_junwei;
+  if (name.equals("佩丽卡")) return img_peilika;
+  if (name.equals("弧光")) return img_huguang;
+  if (name.equals("艾维文娜")) return img_aiweiwenna;
+  if (name.equals("大潘")) return img_dapan;
+  if (name.equals("陈千语")) return img_chenqianyu;
+  if (name.equals("狼卫")) return img_langwei;
+  if (name.equals("赛希")) return img_saixi;
+  if (name.equals("昼雪")) return img_zhouxue;
+  if (name.equals("阿列什")) return img_alieshe;
+  if (name.equals("秋栗")) return img_qiuli;
+  if (name.equals("卡契尔")) return img_kaqier;
+  if (name.equals("埃特拉")) return img_aitela;
+  if (name.equals("萤石")) return img_yingshi;
+  if (name.equals("安塔尔")) return img_antaer;
+  return null;
+}
+
+
+void draw() {
+  background(20); 
+  
+
+  if (isStoreOpen) {
+    background(225); 
+    
+    fill(40); rect(0, 0, width, 45);
+    fill(255); textSize(14); text("// 采购中心", 20, 28);
+    
+    fill(60); rect(width - 210, 10, 80, 26, 13); 
+    rect(width - 120, 10, 80, 26, 13); 
+    
+    img_stone_icon.x = width - 195; img_stone_icon.y = 23; img_stone_icon.draw();
+    img_yu_icon.x = width - 105; img_yu_icon.y = 23; img_yu_icon.draw();
+    
+    fill(255); textSize(12); textAlign(RIGHT);
+    text(yanZhiYuanShi, width - 140, 27);
+    text(qianJingYu, width - 50, 27);
+    textAlign(LEFT);
+    
+    fill(180); rect(width - 35, 10, 25, 25, 4);
+    fill(255); textAlign(CENTER); text("X", width - 22, 27); textAlign(LEFT);
+
+    String[] prices = {"$1.99", "$8.99", "$12.99", "$20.99", "$33.99", "$69.99"};
+    String[] counts = {"x12", "x21", "x34", "x57", "x92", "x194"};
+    String[] titles = {"开采衍质源石", "开采一组衍质源石", "开采一堆衍质源石", "开采一袋衍质源石", "开采一盒衍质源石", "开采一箱衍质源石"};
+    
+    for (int i = 0; i < 6; i++) {
+      int cardX = 25 + i * 78;
+      int cardY = 80;
+      int cardW = 70;
+      int cardH = 240;
+      
+      fill(240); stroke(200); strokeWeight(1); rect(cardX, cardY, cardW, cardH, 4); noStroke();
+      fill(242, 202, 38); rect(cardX, cardY + 70, cardW, 15);
+      fill(0); textSize(9); textAlign(CENTER); text("双倍 仅限一次", cardX + cardW/2, cardY + 81);
+      
+      img_stone_big.x = cardX + cardW/2; img_stone_big.y = cardY + 40; img_stone_big.draw();
+      fill(40); textSize(14); text(counts[i], cardX + cardW/2, cardY + 115);
+      fill(120); textSize(9); text(titles[i], cardX + cardW/2, cardY + 160);
+      
+      fill(225, 235, 245); rect(cardX + 5, cardY + 200, cardW - 10, 30, 4);
+      fill(20, 100, 200); textSize(12); text(prices[i], cardX + cardW/2, cardY + 220);
+    }
+    textAlign(LEFT);
+    fill(100); textSize(11); text("请适度娱乐，理性消费", 30, 360);
+    return; 
+  }
+
+
+  fill(255, 150); textSize(14); text("// 干员寻访", 20, 30);
+  
+  if (img_kamiu != null) {
+    img_kamiu.draw();
+  }
+  
+  fill(30, 30, 30, 220); 
+  rect(width - 210, 10, 85, 26, 13); 
+  rect(width - 115, 10, 100, 26, 13); 
+  
+  img_stone_icon.x = width - 195; img_stone_icon.y = 23; img_stone_icon.draw();
+
+
+img_yu_icon.x = width - 100; img_yu_icon.y = 23; img_yu_icon.draw();
+fill(255); textSize(12); textAlign(RIGHT);
+text(yanZhiYuanShi, width - 135, 27);
+text(qianJingYu + " +", width - 25, 27);
+textAlign(LEFT);
+fill(255, 220); textSize(16); text("卡缪", 310, 170);
+fill(242, 202, 38); textSize(11); text("★★★★★★", 310, 190);
+fill(242, 202, 38); rect(310, 202, 50, 16, 2);
+fill(0); textSize(10); text("仅限一次", 314, 214);
+int displayKamiu = max(0, 120 - totalPulls);
+fill(255); textSize(12);
+if (!hasGottenKamiu) {
+text(displayKamiu + " 次内寻访必得", 368, 214);
+} else {
+text("限定保底已结束", 368, 214);
+}
+fill(255, 160); textSize(11);
+text("● 剩余12天 结束于 07/15 17:00 UTC-5", 310, 75);
+int displayPity6 = max(0, 80 - pity6Counter);
+int displayPity5 = max(0, 10 - pity5Counter);
+fill(200);
+text(displayPity6 + " 次内寻访必得 6星干员", 310, 95);
+text(displayPity5 + " 次内寻访必得 5星或以上干员", 310, 110);
+fill(40, 40, 40, 200); rect(15, height - 35, 175, 24, 4);
+fill(245); textSize(11); text("按下 [ W ] 键查看历史寻访记录", 20, height - 19);
+
+
+  fill(35, 35, 35, 240); rect(250, height - 50, 110, 36, 4);
+  fill(245); textSize(12); text("寻访一次", 270, height - 32);
+  img_yu_icon.x = 282; img_yu_icon.y = height - 21; img_yu_icon.draw(); 
+  fill(180); textSize(11); text("500", 298, height - 18); 
+
+  
+  fill(242, 202, 38); rect(375, height - 50, 110, 36, 4); 
+  fill(0); textSize(12); text("寻访十次", 395, height - 32);
+  img_yu_icon.x = 405; img_yu_icon.y = height - 21; img_yu_icon.draw(); 
+  textSize(11); text("5000", 421, height - 18); 
+
+
+if (showQueue.size() > 0) {
+fill(15, 15, 15); rect(0, 0, width, height);
+Operator currentShow = showQueue.get(0);
+if (currentShow.sprite != null) {
+currentShow.sprite.drawFullScreen();
+} else {
+rectMode(CENTER);
+if (currentShow.star == 6) fill(255, 128, 0, 50);
+else if (currentShow.star == 5) fill(255, 215, 0, 50);
+else fill(186, 85, 211, 50);
+rect(width/2, height/2, 240, 320, 10);
+rectMode(CORNER);
+}
+textAlign(CENTER);
+if (currentShow.star == 6) fill(255, 128, 0);
+else if (currentShow.star == 5) fill(255, 215, 0);
+else fill(186, 85, 211);
+textSize(26); text(currentShow.name, width/2, height - 60);
+textSize(16); fill(180);
+String stars = "";
+for (int k = 0; k < currentShow.star; k++) stars += "★";
+text(stars, width/2, height - 35);
+textSize(12); text("点击任意空白处继续", width/2, height - 12);
+textAlign(LEFT);
+}
+
+else if (isWindowOpen) {
+fill(0, 0, 0, 180); rect(0, 0, width, height);
+fill(245); stroke(180); strokeWeight(2); rect(40, 30, 420, 340, 8); noStroke();
+fill(40); textSize(18); text("历史寻访记录", 60, 65);
+fill(250, 80, 80); rect(420, 40, 26, 26, 4);
+fill(255); textSize(14); text("X", 429, 58);
+int totalPages = max(1, ceil((float)historyLog.size() / itemsPerPage));
+if (currentPage > totalPages) currentPage = totalPages;
+fill(100); textSize(14); textAlign(RIGHT);
+text(currentPage + " / " + totalPages, 400, 65);
+textAlign(LEFT);
+fill(150); textSize(11); text("使用键盘 [ ← ] 和 [ → ] 键进行翻页", 60, 350);
+textSize(14);
+int count = 0;
+int startIdx = historyLog.size() - 1 - (currentPage - 1) * itemsPerPage;
+int endIdx = max(0, startIdx - itemsPerPage + 1);
+for (int i = startIdx; i >= endIdx; i--) {
+String record = historyLog.get(i);
+if (record.contains("6★")) fill(210, 100, 0);
+else if (record.contains("5★")) fill(180, 130, 0);
+else fill(130, 60, 160);
+int x = 80; int y = 100 + count * 22;
+text((i + 1) + ". " + record, x, y);
+count++;
+}
+textSize(16);
+}
+
+if (dialogType > 0 && showQueue.size() == 0 && !isWindowOpen) {
+fill(0, 0, 0, 190); rect(0, 0, width, height);
+fill(255); rect(0, 120, width, 160);
+fill(235, 200, 40); rect(0, 120, width, 4);
+fill(0); textSize(14); textAlign(CENTER);
+if (dialogType == 1) {
+text("是否消耗 嵌晶玉 × 5000 进行寻访？", width/2, 160);
+img_yu_big.x = width/2; img_yu_big.y = 200; img_yu_big.draw();
+fill(100); textSize(11); text("拥有: " + qianJingYu, width/2, 235);
+}
+else if (dialogType == 2) {
+text("是否消耗 嵌晶玉 × 500 进行寻访？", width/2, 160);
+img_yu_big.x = width/2; img_yu_big.y = 200; img_yu_big.draw();
+fill(100); textSize(11); text("拥有: " + qianJingYu, width/2, 235);
+}
+else if (dialogType == 3) {
+text("衍质源石不足，是否前往采购中心购买？", width/2, 190);
+}
+else if (dialogType == 4) {
+int missing = (dialogType == 2) ? 500 - qianJingYu : 5000 - qianJingYu;
+if (missing < 0) missing = 0;
+int needYuanShi = ceil((float)missing / 75);
+text("现有嵌晶玉不足，是否消耗 衍质源石×" + needYuanShi + " 兑换 嵌晶玉×" + (needYuanShi*75) + " 并进行寻访？", width/2, 160);
+img_stone_big.x = 210; img_stone_big.y = 210; img_stone_big.draw();
+img_yu_big.x = 290; img_yu_big.y = 210; img_yu_big.draw();
+fill(0); textSize(16); text("≫", width/2, 215);
+fill(100); textSize(11); text("当前拥有源石: " + yanZhiYuanShi + " | 拥有玉: " + qianJingYu, width/2, 240);
+}
+textAlign(LEFT);
+fill(60); rect(130, 252, 110, 24, 12);
+fill(255); textSize(11); text("取消 ", 168, 268);
+fill(242, 202, 38); rect(260, 252, 110, 24, 12);
+fill(0); textSize(11); text("确认 ", 298, 268);
+}
+}
+
+void mousePressed() {
+if (showQueue.size() > 0) {
+showQueue.remove(0);
+return;
+}
+if (isWindowOpen) {
+if (mouseX >= 420 && mouseX <= 446 && mouseY >= 40 && mouseY <= 66) {
+isWindowOpen = false;
+}
+return;
+}
+if (isStoreOpen) {
+if (mouseX >= width - 40 && mouseX <= width - 15 && mouseY >= 10 && mouseY <= 35) {
+isStoreOpen = false;
+return;
+}
+int[] addValues = new int[]{12, 21, 34, 57, 92, 194};
+for (int i = 0; i < 6; i++) {
+int cardX = 25 + i * 78;
+if (mouseX >= cardX + 5 && mouseX <= cardX + 73 && mouseY >= 280 && mouseY <= 310) {
+yanZhiYuanShi += addValues[i];
+}
+}
+return;
+}
+if (dialogType > 0) {
+if (mouseX >= 130 && mouseX <= 240 && mouseY >= 252 && mouseY <= 276) {
+dialogType = 0;
+}
+else if (mouseX >= 260 && mouseX <= 370 && mouseY >= 252 && mouseY <= 276) {
+if (dialogType == 1) {
+qianJingYu -= 5000; dialogType = 0; currentResult.clear();
+for (int i = 0; i < 10; i++) executeSingleGacha();
+}
+else if (dialogType == 2) {
+qianJingYu -= 500; dialogType = 0; currentResult.clear();
+executeSingleGacha();
+}
+else if (dialogType == 3) {
+dialogType = 0; isStoreOpen = true;
+}
+else if (dialogType == 4) {
+boolean isSingle = (dialogType == 2);
+int missing = isSingle ? 500 - qianJingYu : 5000 - qianJingYu;
+if (missing < 0) missing = 0;
+int needYuanShi = ceil((float)missing / 75);
+yanZhiYuanShi -= needYuanShi;
+qianJingYu += needYuanShi * 75;
+dialogType = 0;
+if (!isSingle) {
+qianJingYu -= 5000;
+currentResult.clear();
+for(int i = 0; i < 10; i++) executeSingleGacha();
+} else {
+qianJingYu -= 500;
+currentResult.clear();
+executeSingleGacha();
+}
+}
+}
+return;
+}
+if (mouseX >= 250 && mouseX <= 360 && mouseY >= height - 50 && mouseY <= height - 14) {
+if (qianJingYu >= 500) dialogType = 2;
+else {
+int missing = 500 - qianJingYu; int needYuanShi = ceil((float)missing / 75);
+if (yanZhiYuanShi >= needYuanShi) dialogType = 4; else dialogType = 3;
+}
+}
+else if (mouseX >= 375 && mouseX <= 485 && mouseY >= height - 50 && mouseY <= height - 14) {
+if (qianJingYu >= 5000) dialogType = 1;
+else {
+int missing = 5000 - qianJingYu; int needYuanShi = ceil((float)missing / 75);
+if (yanZhiYuanShi >= needYuanShi) dialogType = 4; else dialogType = 3;
+}
+}
+}
+
+void keyPressed() {
+if (showQueue.size() == 0) {
+if (key == 'w' || key == 'W') {
+isWindowOpen = !isWindowOpen;
+if (isWindowOpen) currentPage = 1;
+}
+if (isWindowOpen) {
+int totalPages = max(1, ceil((float)historyLog.size() / itemsPerPage));
+if (key == CODED) {
+if (keyCode == LEFT) {
+if (currentPage > 1) currentPage--;
+} else if (keyCode == RIGHT) {
+if (currentPage < totalPages) currentPage++;
+}
+}
+}
+}
+}
+
+void executeSingleGacha() {
+totalPulls++;
+pity5Counter++;
+pity6Counter++;
+if (!hasGottenKamiu && totalPulls >= 120) {
+hasGottenKamiu = true; pity6Counter = 0; pity5Counter = 0;
+Operator op = new Operator("卡缪", 6, getSpriteByName("卡缪"));
+currentResult.add(op); showQueue.add(op);
+historyLog.add("[6★] 卡缪 (保底)");
+return;
+}
+float currentRate6 = rate6;
+if (pity6Counter >= 66) currentRate6 += (pity6Counter - 65) * 0.05;
+if (pity6Counter >= 80) currentRate6 = 1.0;
+float currentRate5 = rate5;
+if (pity5Counter >= 10 && currentRate6 < 1.0) currentRate5 = 1.0 - currentRate6;
+float dice = random(0, 1);
+if (dice < currentRate6) {
+pity6Counter = 0; pity5Counter = 0;
+String finalName = "";
+if (!hasGottenKamiu) {
+if (random(0, 1) < 0.5) {
+hasGottenKamiu = true; finalName = "卡缪";
+} else {
+int idx = int(random(1, pool6.length)); finalName = pool6[idx];
+}
+} else {
+int idx = int(random(0, pool6.length)); finalName = pool6[idx];
+}
+Operator op = new Operator(finalName, 6, getSpriteByName(finalName));
+currentResult.add(op); showQueue.add(op);
+historyLog.add("[6★] " + finalName);
+}
+else if (dice < currentRate6 + currentRate5) {
+pity5Counter = 0;
+int idx = int(random(0, pool5.length)); String finalName = pool5[idx];
+Operator op = new Operator(finalName, 5, getSpriteByName(finalName));
+currentResult.add(op); showQueue.add(op);
+historyLog.add("[5★] " + finalName);
+}
+else {
+int idx = int(random(0, pool4.length)); String finalName = pool4[idx];
+Operator op = new Operator(finalName, 4, getSpriteByName(finalName));
+currentResult.add(op); showQueue.add(op);
+historyLog.add("[4★] " + finalName);
+}
+}
